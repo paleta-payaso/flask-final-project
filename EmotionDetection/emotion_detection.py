@@ -19,14 +19,20 @@ def emotion_detector(text_to_analyze):
     formatted_response = json.loads(response.text)
 
     # grab emotions score dictionary
-    emotion_scores = formatted_response['emotionPredictions'][0]['emotion']
+    if response.status_code == 400:
+        emotion_scores = {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None}
+    else:
+        emotion_scores = formatted_response['emotionPredictions'][0]['emotion']
     
     # dominant emotion
-    major_score = max(emotion_scores.values())
-    emotion_scores['dominant_emotion'] = None
-    for k, v in emotion_scores.items():
-        if v == major_score:
-            emotion_scores['dominant_emotion'] = k
+    if response.status_code == 400:
+        emotion_scores['dominant_emotion'] = 'Invalid text. Please try again.'
+    else:
+        major_score = max(emotion_scores.values())
+        emotion_scores['dominant_emotion'] = None
+        for k, v in emotion_scores.items():
+            if v == major_score:
+                emotion_scores['dominant_emotion'] = k
     
     return emotion_scores
 
